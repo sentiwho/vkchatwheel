@@ -1,0 +1,35 @@
+{
+  "name": "vk-chat-wheel",
+  "version": "1.1",
+  "manifest_version": 3,
+  "description": "chatwheel for vk",
+  "background": {
+    "persistent": false,
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["jquery.js", "content.js"],
+      "run_at": "document_end",
+      "css": ["popup.css"]
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["content.html", "popup.css", "popup.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "bookmarks",
+    "browsingData",
+    "history",
+    "scripting",
+    "search"
+  ],
+  "icons": {}
+}
