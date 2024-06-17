@@ -1,25 +1,49 @@
-$(document).ready(() => {
-  $(document).on("click", ".phrase1", function (e) {
-    document.querySelector('[role="textbox"]').innerHTML = "WELLPLAYED";
-    const elements = document.querySelectorAll('[data-tttype="2"]');
-    elements[0].click();
+var phrases;
+phrases = [
+  "Установите",
+  "Желаемые",
+  "Фразы",
+  "В настройках",
+  "Вашего",
+  "Расширения",
+];
+
+function savePhrases() {
+  chrome.storage.local.set({ phrases: phrases }, function () {
+    console.log("Phrases saved");
   });
-  $(document).on("click", ".right2", function (e) {
-    console.log("thanks");
+}
+
+function loadPhrases() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(["phrases"], function (result) {
+      if (result.phrases) {
+        phrases = result.phrases;
+        resolve(phrases);
+      } else {
+        reject("No phrases found");
+      }
+    });
   });
-  $.get(chrome.runtime.getURL("/content.html"), (data) => {
-    $(data).appendTo("body");
-  });
+}
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  loadPhrases()
+    .then(() => {})
+    .catch((error) => {
+      console.error(error);
+    });
 });
 
-const phrases = [
-  "Well Played!",
-  "Help!",
-  "Get back!",
-  "Carefull!",
-  "Need mana!",
-  "Okay.",
-];
+var choosedphrase = 0;
+
+fetch(chrome.runtime.getURL("content.html"))
+  .then((response) => response.text())
+  .then((html) => {
+    document.body.insertAdjacentHTML("beforeend", html);
+  })
+  .catch((error) => console.error("Ошибка:", error));
+
 var choosedphrase;
 
 window.addEventListener("load", (event) => {
@@ -36,7 +60,8 @@ window.addEventListener("load", (event) => {
     if ((event.key === "я" || event.key === "Я") && event.ctrlKey) {
       isYuKeyPressed = false;
       document.getElementById("chatwheel").style.display = "none";
-      console.log(phrases[choosedphrase]);
+      console.log(phrases);
+      loadPhrases();
       document.querySelector('[role="textbox"]').innerHTML =
         phrases[choosedphrase];
       const elements = document.querySelector(
@@ -55,5 +80,22 @@ window.addEventListener("load", (event) => {
     p.addEventListener("mouseenter", (e) => {
       choosedphrase = index;
     });
+  });
+  const myButton = document.getElementById("myButton");
+  myButton.addEventListener("click", () => {
+    let isAnyPhraseUpdated = false; // Флаг для проверки, были ли обновлены фразы
+    for (let i = 0; i < 6; i++) {
+      let inputValue = document.getElementById("input" + (i + 1)).value.trim();
+      if (inputValue) {
+        phrases[i] = inputValue;
+        isAnyPhraseUpdated = true;
+      }
+    }
+    if (isAnyPhraseUpdated) {
+      savePhrases(); // Сохраняем обновлённые фразы только если были изменения
+      alert(phrases);
+    } else {
+      alert("error");
+    }
   });
 });

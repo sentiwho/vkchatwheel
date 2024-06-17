@@ -4,21 +4,23 @@
   "manifest_version": 3,
   "description": "chatwheel for vk",
   "background": {
-    "persistent": false,
-    "service_worker": "background.js"
+    "persistent": false
+  },
+  "action": {
+    "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["jquery.js", "content.js"],
+      "matches": ["https://vk.com/*"],
+      "js": ["content.js"],
       "run_at": "document_end",
       "css": ["popup.css"]
     }
   ],
-
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["content.html", "popup.css", "popup.js"],
+      "resources": ["content.html", "popup.css"],
       "matches": ["<all_urls>"]
     }
   ],
@@ -29,7 +31,8 @@
     "browsingData",
     "history",
     "scripting",
-    "search"
+    "search",
+    "storage"
   ],
   "icons": {}
 }
